@@ -65,28 +65,19 @@ You can create your own error types by inheriting from the `Error` class. This a
 #### Example
 
 ```csharp
-public class ValidationError : Error
-{
-    public string FieldName { get; }
-
-    public ValidationError(string message, string fieldName)
-        : base(message)
-    {
-        FieldName = fieldName;
-    }
-}
+public record DateTimeError(string Message, DateTime StartDate, DateTime EndDate) : Error(Message);
 ```
 
 #### Using Custom Errors
 
 ```csharp
-var validationError = new ValidationError("Invalid input", "Username");
-var failureResult = Result<int>.Failure(validationError);
+var dateTimeError = new DateTimeError("Date is not within the allowed range", DateTime.MinValue, DateTime.MaxValue);
+var failureResult = Result<int>.Failure(dateTimeError);
 
 if (failureResult.IsFailure)
 {
-    var error = (ValidationError)failureResult.Error;
-    Console.WriteLine($"Error: {error.Message}, Field: {error.FieldName}");
+    var error = (DateTimeError)failureResult.Error;
+    Console.WriteLine($"Error: {error.Message}, Start Date: {error.StartDate}, End Date: {error.EndDate}");
 }
 ```
 
