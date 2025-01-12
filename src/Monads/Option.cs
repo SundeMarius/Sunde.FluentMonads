@@ -64,6 +64,17 @@ public static class OptionExtensions
         return option.IsSome && predicate(option.Value) ? option : Option<T>.None();
     }
 
+    public static Option<T> And<T>(this Option<T> option, Option<T> other)
+    {
+        return option.IsSome && other.IsSome ? other : Option<T>.None();
+    }
+
+    public static Option<T> AndThen<T>(this Option<T> option, Func<T, Option<T>> func)
+    {
+        return option.IsSome ? func(option.Value) : Option<T>.None();
+    }
+
+
     public static Option<T> Or<T>(this Option<T> option, Option<T> other)
     {
         return option.IsSome ? option : other;
@@ -77,5 +88,27 @@ public static class OptionExtensions
     public static Option<T> OrElse<T>(this Option<T> option, Func<T> func)
     {
         return option.OrElse(func());
+    }
+
+    public static bool Contains<T>(this Option<T> option, T value)
+    {
+        return option.IsSome && option.Value!.Equals(value);
+    }
+
+    public static T Expect<T>(this Option<T> option, string message)
+    {
+        if (option.IsNone)
+            throw new InvalidOperationException(message);
+        return option.Value;
+    }
+
+    public static bool IsSomeAnd<T>(this Option<T> option, Func<T, bool> predicate)
+    {
+        return option.IsSome && predicate(option.Value);
+    }
+
+    public static bool IsNoneOr<T>(this Option<T> option, Func<T, bool> predicate)
+    {
+        return option.IsNone || predicate(option.Value);
     }
 }
