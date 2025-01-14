@@ -4,9 +4,32 @@
 
 The Monads library offers functional programming constructs for .NET, such as `Result` and `Option` types. These constructs enable more expressive and type-safe error handling and management of optional values.
 
+### Benefits of Using Monads Over Exceptions
+
+Using monads like `Result` and `Option` provides several benefits over traditional exception-based error handling:
+
+1. **Type Safety**: Monads make error handling explicit in the type system, reducing the risk of unhandled exceptions and making the code more predictable.
+2. **Composability**: Monads allow for easy composition of operations, enabling more readable and maintainable code.
+3. **Immutability**: Monads encourage immutability, leading to safer and more reliable code.
+4. **Separation of Concerns**: Monads separate error handling logic from business logic, making the code cleaner and easier to understand.
+5. **Functional Programming**: Monads align with functional programming principles, promoting pure functions and reducing side effects.
+6. **Explicit Error Handling**: Monads require explicit handling of success and failure cases, leading to more robust and error-resistant code.
+
+### Potential Drawbacks of Using Monads
+
+While monads offer many benefits, there are also some potential drawbacks to consider:
+
+1. **Learning Curve**: Monads can be difficult to understand for developers who are not familiar with functional programming concepts. This can lead to a steeper learning curve and may require additional training or education.
+2. **Verbosity**: Using monads can sometimes make the code more verbose, as it requires explicit handling of success and failure cases. This can lead to more boilerplate code compared to traditional exception handling.
+3. **Integration with Existing Code**: Integrating monads into an existing codebase that relies heavily on exceptions can be challenging. It may require significant refactoring to adopt monads consistently throughout the codebase.
+4. **C# Language Limitations**: While C# supports functional programming to some extent, it is primarily an imperative object-oriented language. This can make the use of monads feel less natural and more cumbersome compared to languages that are designed with functional programming in mind.
+
+Despite these drawbacks, the benefits of using monads often outweigh the cons, especially in projects that prioritize type safety, composability, and functional programming principles.
+
 ## Features
 
 - `Result<T>`: Represents a value that can either be a success or a failure, with `Error` used to represent errors with a message for error handling.
+- `Result`: A non-generic version of `Result<T>` that represents the outcome of a void method, indicating success or failure without carrying a value. It is useful when you only need to signal the success or failure of an operation without returning additional data.
 - `Option<T>`: Represents an optional value that can either be present (`Some`) or absent (`None`).
 
 ## Installation
@@ -31,7 +54,7 @@ The `Result<T>` type is used to represent the outcome of an operation that can e
 
 The `Error` type is used in conjunction with `Result<T>` to represent errors with a message, optional details, and an optional exception. You can also implement your own custom error types by deriving from the `Error` class.
 
-#### Creating a Result
+#### Creating a generic Result
 
 You can create a `Result` object to represent either a successful operation or a failure.
 
@@ -290,6 +313,56 @@ This will print:
 Result is a failure or the value is 42
 ```
 
+#### Example of non generic Result
+
+The `Result` type can be used to represent the outcome of an operation that does not return a value. Here is an example of a method that performs a division and returns a `Result` indicating success or failure.
+
+```csharp
+public Result Divide(int numerator, int denominator)
+{
+    if (denominator == 0)
+    {
+        return Result.Failure(new Error("Division by zero is not allowed"));
+    }
+
+    var result = numerator / denominator;
+    Console.WriteLine($"Result of division: {result}");
+    return Result.Success();
+}
+
+// Usage
+var divisionResult = Divide(10, 2);
+
+if (divisionResult.IsSuccess)
+{
+    Console.WriteLine("Division was successful");
+}
+else
+{
+    Console.WriteLine($"Division failed: {divisionResult.Error.Message}");
+}
+
+var failedDivisionResult = Divide(10, 0);
+
+if (failedDivisionResult.IsFailure)
+{
+    Console.WriteLine($"Division failed: {failedDivisionResult.Error.Message}");
+}
+```
+
+For a successful division, this will print:
+
+```bash
+Result of division: 5
+Division was successful
+```
+
+For a failed division, this will print:
+
+```bash
+Division failed: Division by zero is not allowed
+```
+
 ### Custom Error Implementation
 
 You can create your own error types by inheriting from the `Error` class. This allows you to add additional context or properties to your errors.
@@ -297,7 +370,7 @@ You can create your own error types by inheriting from the `Error` class. This a
 #### Example
 
 ```csharp
-public record DateTimeError(DateTime StartDate, DateTime EndDate) : Error($"Date is not within the allowed range: {StartDate} - {EndDate}");
+public record InvalidDateRangeError(Date StartDate, Date EndDate) : Error($"Date is not within the allowed range: {StartDate.ToShortDateString()}-{EndDate.ToShortDateString()}");
 ```
 
 #### Using Custom Errors
@@ -305,8 +378,8 @@ public record DateTimeError(DateTime StartDate, DateTime EndDate) : Error($"Date
 You can use the custom error type in your `Result` objects to provide more specific error information.
 
 ```csharp
-var dateTimeError = new DateTimeError(new DateTime(1912, 6, 23), new DateTime(1913, 6, 23));
-var failureResult = Result<int>.Failure(dateTimeError);
+var dateError = new InvalidDateRangeError(new Date(1912, 6, 23), new Date(1913, 6, 23));
+var failureResult = Result<int>.Failure(dateError);
 
 if (failureResult.IsFailure)
 {
@@ -317,7 +390,7 @@ if (failureResult.IsFailure)
 In this example, if the `failureResult` is a failure, it will print:
 
 ```bash
-Error: Date is not within the allowed range: 6/23/1912 12:00:00 AM - 6/23/1913 12:00:00 AM
+Error: Date is not within the allowed range: 6/23/1912-6/23/1913
 ```
 
 This approach allows you to create more specific and informative error messages, improving the overall error handling in your application.
