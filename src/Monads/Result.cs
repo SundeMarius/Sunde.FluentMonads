@@ -2,9 +2,6 @@
 
 public class Result<T>
 {
-    private readonly T _value;
-    private readonly Error _error;
-
     public T Value
     {
         get
@@ -26,28 +23,55 @@ public class Result<T>
     }
 
     public bool IsSuccess { get; }
+
     public bool IsFailure => !IsSuccess;
 
     public static implicit operator Result<T>(T value) => new(value);
+
     public static implicit operator Result<T>(Error error) => new(error);
 
-
     public static Result<T> Success(T value) => new(value);
+
     public static Result<T> Failure(Error error) => new(error);
 
-    private Result(T value)
+    protected Result(T value)
     {
         _value = value;
         IsSuccess = true;
         _error = new Error(string.Empty);
     }
 
-    private Result(Error error)
+    protected Result(Error error)
     {
         _value = default!;
         IsSuccess = false;
         _error = error;
     }
+
+    private readonly T _value;
+    private readonly Error _error;
+}
+
+public class Result : Result<object>
+{
+    public static Result Success() => new(new object());
+
+    public new static Result Failure(Error error) => new(error);
+
+    public new Error Error
+    {
+        get
+        {
+            if (IsSuccess)
+                throw new InvalidOperationException("Cannot access Error when the result is a success.");
+            return base.Error;
+        }
+    }
+
+    private Result(object value) : base(value) { }
+
+    private Result(Error error) : base(error) { }
+
 }
 
 public static class ResultExtensions

@@ -247,4 +247,71 @@ public class ResultTests
         var result = Result<int>.Failure(new Error("Something went wrong"));
         Assert.True(result.IsErrOr(value => value == 42));
     }
+
+    [Fact]
+    public void NonGenericResult_Success()
+    {
+        var result = Result.Success();
+        Assert.True(result.IsSuccess);
+        Assert.False(result.IsFailure);
+    }
+
+    [Fact]
+    public void NonGenericResult_Success_OnSuccess()
+    {
+        var result = Result.Success();
+        var called = false;
+        result.OnSuccess(_ => called = true);
+        Assert.True(called);
+    }
+
+    [Fact]
+    public void NonGenericResult_Success_OnFailure()
+    {
+        var result = Result.Success();
+        var called = false;
+        result.OnFailure(_ => called = true);
+        Assert.False(called);
+    }
+
+    [Fact]
+    public void NonGenericResult_Failure()
+    {
+        var result = Result.Failure(new Error("Something went wrong"));
+        Assert.False(result.IsSuccess);
+        Assert.True(result.IsFailure);
+        Assert.Equal("Something went wrong", result.Error.Message);
+    }
+
+    [Fact]
+    public void NonGenericResult_Failure_OnSuccess()
+    {
+        var result = Result.Failure(new Error("Something went wrong"));
+        var called = false;
+        result.OnSuccess(_ => called = true);
+        Assert.False(called);
+    }
+
+    [Fact]
+    public void NonGenericResult_Failure_OnFailure()
+    {
+        var result = Result.Failure(new Error("Something went wrong"));
+        var called = false;
+        result.OnFailure(_ => called = true);
+        Assert.True(called);
+    }
+
+    [Fact]
+    public void NonGenericResult_Failure_ThrowsWhenAccessingValue()
+    {
+        var result = Result.Failure(new Error("Something went wrong"));
+        Assert.Throws<InvalidOperationException>(() => result.Value);
+    }
+
+    [Fact]
+    public void NonGenericResult_Success_ThrowsWhenAccessingError()
+    {
+        var result = Result.Success();
+        Assert.Throws<InvalidOperationException>(() => result.Error);
+    }
 }

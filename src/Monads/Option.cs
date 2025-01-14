@@ -2,8 +2,6 @@ namespace Monads;
 
 public class Option<T>
 {
-    private readonly T _value;
-
     public T Value
     {
         get
@@ -15,11 +13,13 @@ public class Option<T>
     }
 
     public bool IsSome { get; }
+
     public bool IsNone => !IsSome;
 
     public static implicit operator Option<T>(T value) => new(value);
 
     public static Option<T> Some(T value) => new(value);
+
     public static Option<T> None() => new();
 
     private Option(T value)
@@ -33,6 +33,9 @@ public class Option<T>
         _value = default!;
         IsSome = false;
     }
+
+    private readonly T _value;
+
 }
 
 public static class OptionExtensions
