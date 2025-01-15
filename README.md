@@ -1,5 +1,7 @@
 # Monads Library
 
+[![Coverage Status](https://coveralls.io/repos/github/SundeMarius/Monads/badge.svg?branch=main)](https://coveralls.io/github/SundeMarius/Monads?branch=main)
+
 ## Overview
 
 The Monads library offers functional programming constructs for .NET, such as `Result` and `Option` types. These constructs enable more expressive and type-safe error handling and management of optional values.
