@@ -624,11 +624,7 @@ For `defaultOption`, this will print:
 
 ## Latest Release
 
-The latest release of the Monads library can be found on the [GitHub Releases](https://github.com/SundeMarius/monads/releases) page.
-
-## Code Coverage
-
-The Monads library achieves 100% code and branch coverage for each release, ensuring high reliability and robustness.
+The latest release of the Monads library can be found on [GitHub Releases](https://github.com/SundeMarius/monads/releases).
 
 ## License
 
