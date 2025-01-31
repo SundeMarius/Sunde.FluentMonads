@@ -74,26 +74,40 @@ public class Result : Result<object>
 
 }
 
+
 public static class ResultExtensions
 {
-    public static Result<Tnew> MapSuccess<T, Tnew>(this Result<T> result, Func<T, Tnew> func)
+    public static Result<Tnew> Map<T, Tnew>(this Result<T> result, Func<T, Tnew> func)
     {
         return result.IsSuccess ? func(result.Value) : result.Error;
     }
 
     public static Result<T> MapError<T>(this Result<T> result, Func<Error, Error> func)
     {
-        return result.IsFailure ? func(result.Error) : result.Value;
+        return result.IsFailure ? func(result.Error) : result;
     }
 
-    public static T Match<T>(this Result<T> result, Func<T, T> success, Func<Error, T> failure)
+    public static void Match<T>(this Result<T> result, Action<T> success, Action<Error> failure)
     {
-        return result.IsSuccess ? success(result.Value) : failure(result.Error);
+        if (result.IsSuccess)
+            success(result.Value);
+        else
+            failure(result.Error);
+    }
+
+    public static Result<T> And<T>(this Result<T> result, Result<T> other)
+    {
+        return result.IsFailure ? result : other;
+    }
+
+    public static Result<T> AndThen<T>(this Result<T> result, Func<T, Result<T>> func)
+    {
+        return result.IsSuccess ? func(result.Value) : result;
     }
 
     public static Result<T> Or<T>(this Result<T> result, Result<T> other)
     {
-        return result.IsFailure ? other : result.Value;
+        return result.IsFailure ? other : result;
     }
 
     public static T OrElse<T>(this Result<T> result, T value)
@@ -104,6 +118,18 @@ public static class ResultExtensions
     public static T OrElse<T>(this Result<T> result, Func<T> func)
     {
         return result.OrElse(func());
+    }
+
+    public static Result<T> OrElse<T>(this Result<T> result, Func<Error, Result<T>> func)
+    {
+        return result.IsFailure ? func(result.Error) : result;
+    }
+
+    public static Result<T> Validate<T>(this Result<T> result, Func<T, bool> predicate, Error error)
+    {
+        if (result.IsFailure)
+            return result;
+        return result.IsOkAnd(predicate) ? result : error;
     }
 
     public static Result<T> OnSuccess<T>(this Result<T> result, Action<T> action)

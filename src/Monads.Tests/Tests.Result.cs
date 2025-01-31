@@ -38,7 +38,7 @@ public class ResultTests
     public void Result_Success_CanMapValue()
     {
         var result = Result<int>.Success(42);
-        var mapped = result.MapSuccess(x => x * 2);
+        var mapped = result.Map(x => x * 2);
         Assert.True(mapped.IsSuccess);
         Assert.Equal(84, mapped.Value);
     }
@@ -47,7 +47,7 @@ public class ResultTests
     public void Result_Failure_CanMapValue()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        var mapped = result.MapSuccess(x => x * 2);
+        var mapped = result.Map(x => x * 2);
         Assert.True(mapped.IsFailure);
         Assert.Equal("Something went wrong", mapped.Error.Message);
     }
@@ -71,25 +71,67 @@ public class ResultTests
     }
 
     [Fact]
-    public void Result_Success_Match()
+    public void Result_Success_Match_Action()
     {
         var result = Result<int>.Success(42);
-        var matched = result.Match(
-            success => success * 2,
-            failure => -1
+        var successCalled = false;
+        var failureCalled = false;
+
+        result.Match(
+            success: _ => successCalled = true,
+            failure: _ => failureCalled = true
         );
-        Assert.Equal(84, matched);
+
+        Assert.True(successCalled);
+        Assert.False(failureCalled);
     }
 
     [Fact]
-    public void Result_Failure_Match()
+    public void Result_Failure_Match_Action()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        var matched = result.Match(
-            success => success * 2,
-            failure => -1
+        var successCalled = false;
+        var failureCalled = false;
+
+        result.Match(
+            success: _ => successCalled = true,
+            failure: _ => failureCalled = true
         );
-        Assert.Equal(-1, matched);
+
+        Assert.False(successCalled);
+        Assert.True(failureCalled);
+    }
+
+    [Fact]
+    public void NonGenericResult_Success_Match_Action()
+    {
+        var result = Result.Success();
+        var successCalled = false;
+        var failureCalled = false;
+
+        result.Match(
+            success: _ => successCalled = true,
+            failure: _ => failureCalled = true
+        );
+
+        Assert.True(successCalled);
+        Assert.False(failureCalled);
+    }
+
+    [Fact]
+    public void NonGenericResult_Failure_Match_Action()
+    {
+        var result = Result.Failure(new Error("Something went wrong"));
+        var successCalled = false;
+        var failureCalled = false;
+
+        result.Match(
+            success: _ => successCalled = true,
+            failure: _ => failureCalled = true
+        );
+
+        Assert.False(successCalled);
+        Assert.True(failureCalled);
     }
 
     [Fact]
