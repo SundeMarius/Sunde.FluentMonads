@@ -1,4 +1,6 @@
-namespace Monads.Tests;
+using FluentMonads;
+
+namespace Test.FluentMonads;
 
 public class ResultTests
 {

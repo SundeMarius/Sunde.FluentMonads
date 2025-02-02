@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for considering contributing to the Monads Library! Here are some guidelines to help you get started.
+Thank you for considering contributing to the FluentMonads Library! Here are some guidelines to help you get started.
 
 ## How to Contribute
 

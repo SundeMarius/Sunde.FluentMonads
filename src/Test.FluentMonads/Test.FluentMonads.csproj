@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Monads/Monads.csproj" />
+    <ProjectReference Include="../FluentMonads/FluentMonads.csproj" />
   </ItemGroup>
 
 </Project>

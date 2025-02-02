@@ -31,7 +31,7 @@ def main():
 
     run_command('dotnet pack -c Release src/')
 
-    package_path = get_latest_package('src/Monads/bin/Release')
+    package_path = get_latest_package('src/FluentMonads/bin/Release')
 
     run_command(f'dotnet nuget push {package_path} -k {nuget_api_key} -s https://api.nuget.org/v3/index.json')
 

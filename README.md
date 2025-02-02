@@ -1,10 +1,10 @@
-# Monads Library
+# Sunde.FluentMonads Library
 
 [![Coverage Status](https://coveralls.io/repos/github/SundeMarius/Monads/badge.svg?branch=main)](https://coveralls.io/github/SundeMarius/Monads?branch=main)
 
 ## Overview
 
-The Monads library offers functional programming constructs for .NET, such as `Result` and `Option` types. These constructs enable more expressive and type-safe error handling and management of optional values.
+The FluentMonads library offers functional programming constructs for .NET, such as `Result` and `Option` types. These constructs enable more expressive and type-safe error handling and management of optional values.
 
 ### Benefits of Using Monads Over Exceptions
 
@@ -36,16 +36,16 @@ Despite these drawbacks, the benefits of using monads often outweigh the cons, e
 
 ## Installation
 
-To install the Monads library, add the following package reference to your project:
+To install the FluentMonads library, add the following package reference to your project:
 
 ```xml
-<PackageReference Include="Monads" />
+<PackageReference Include="Sunde.FluentMonads" />
 ```
 
 Alternatively, you can use the .NET CLI to add the package:
 
 ```sh
-dotnet add package Monads
+dotnet add package Sunde.FluentMonads
 ```
 
 ## Usage
@@ -690,7 +690,7 @@ For `defaultOption`, this will print:
 
 ## Latest Release
 
-The latest release of the Monads library can be found on [GitHub Releases](https://github.com/SundeMarius/monads/releases).
+The latest release of the FluentMonads library can be found on [GitHub Releases](https://github.com/SundeMarius/monads/releases).
 
 ## License
 
@@ -698,4 +698,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Author
 
-Marius Sunde Sivertsen
+Marius Sunde

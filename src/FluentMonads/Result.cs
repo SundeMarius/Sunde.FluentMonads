@@ -1,4 +1,4 @@
-﻿namespace Monads;
+﻿namespace FluentMonads;
 
 public class Result<T>
 {

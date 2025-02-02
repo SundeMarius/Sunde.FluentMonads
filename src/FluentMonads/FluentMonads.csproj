@@ -4,14 +4,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Sunde.FluentMonads</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Marius Sunde</Authors>
     <Owners>Marius Sunde</Owners>
-    <Description>The Monads library provides a set of functional programming constructs for .NET,
+    <Description>The FluentMonads library provides a set of functional programming constructs for .NET,
       including Result and Option types.</Description>
     <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
     <Copyright>Copyright © 2025 Marius Sunde</Copyright>
-    <PackageTags>c# .net monads functional-programming result option</PackageTags>
+    <PackageTags>c# .net fluent monads functional-programming result option</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SundeMarius/monads</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SundeMarius/monads</RepositoryUrl>
