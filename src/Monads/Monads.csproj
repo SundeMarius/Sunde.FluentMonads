@@ -3,8 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>Monads</PackageId>
-    <Version>1.0.0</Version>
+    <PackageId>Sunde.Monads</PackageId>
+    <Version>1.0.1</Version>
     <Authors>Marius Sunde</Authors>
     <Owners>Marius Sunde</Owners>
     <Description>The Monads library provides a set of functional programming constructs for .NET,
@@ -15,5 +15,12 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SundeMarius/monads</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SundeMarius/monads</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>true</Pack>
+      <PackagePath>README.md</PackagePath>
+    </None>
+  </ItemGroup>
 </Project>
