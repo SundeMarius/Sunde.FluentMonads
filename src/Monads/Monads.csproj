@@ -3,8 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>Sunde.Monads</PackageId>
-    <Version>1.0.2</Version>
+    <PackageId>Sunde.FluentMonads</PackageId>
+    <Version>1.0.0</Version>
     <Authors>Marius Sunde</Authors>
     <Owners>Marius Sunde</Owners>
     <Description>The Monads library provides a set of functional programming constructs for .NET,
