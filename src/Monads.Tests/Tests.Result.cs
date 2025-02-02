@@ -257,6 +257,64 @@ public class ResultTests
     }
 
     [Fact]
+    public void Result_TryCatch_Generic_Success()
+    {
+        var result = ResultExtensions.TryCatch(() => 42);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(42, result.Value);
+    }
+
+    [Fact]
+    public void Result_TryCatch_Generic_Failure()
+    {
+        var result = ResultExtensions.TryCatch<int>(() => throw new InvalidOperationException("Something went wrong"));
+        Assert.True(result.IsFailure);
+        Assert.Equal("Something went wrong", result.Error.Message);
+    }
+
+    [Fact]
+    public void Result_TryCatch_NonGeneric_Success()
+    {
+        var result = ResultExtensions.TryCatch(() => Console.WriteLine("Hello, World!"));
+        Assert.True(result.IsSuccess);
+    }
+
+    [Fact]
+    public void Result_TryCatch_NonGeneric_Failure()
+    {
+        var result = ResultExtensions.TryCatch(() => throw new InvalidOperationException("Something went wrong"));
+        Assert.True(result.IsFailure);
+        Assert.Equal("Something went wrong", result.Error.Message);
+    }
+
+    [Fact]
+    public void Result_TryCatch_Generic_WithResult_Success()
+    {
+        var result = Result<int>.Success(42);
+        var tryCatchResult = result.TryCatch(x => x / 2);
+        Assert.True(tryCatchResult.IsSuccess);
+        Assert.Equal(21, tryCatchResult.Value);
+    }
+
+    [Fact]
+    public void Result_TryCatch_Generic_WithResult_Failure()
+    {
+        var result = Result<int>.Success(42);
+        var tryCatchResult = result.TryCatch(x => x / 0);
+        Assert.True(tryCatchResult.IsFailure);
+        Assert.Equal("Attempted to divide by zero.", tryCatchResult.Error.Message);
+    }
+
+    [Fact]
+    public void Result_TryCatch_Generic_WithResult_Failure_InitialFailure()
+    {
+        var result = Result<int>.Failure(new Error("Initial failure"));
+        var tryCatchResult = result.TryCatch(x => x / 2);
+        Assert.True(tryCatchResult.IsFailure);
+        Assert.Equal("Initial failure", tryCatchResult.Error.Message);
+    }
+
+    [Fact]
     public void Result_Success_TryCatch()
     {
         var result = Result<int>.Success(42);
