@@ -67,10 +67,10 @@ var failureResult = Result<int>.Failure(new Error("Something went wrong"));
 
 #### Mapping Success and Error
 
-You can use the `MapSuccess` method to transform the value of a successful result, and the `MapError` method to transform the error of a failed result.
+You can use the `Map` method to transform the value of a successful result, and the `MapError` method to transform the error of a failed result.
 
 ```csharp
-var mappedSuccess = successResult.MapSuccess(x => x * 2);
+var mappedSuccess = successResult.Map(x => x * 2);
 var mappedError = failureResult.MapError(e => new Error(e.Message + "!!!"));
 
 if (mappedSuccess.IsSuccess)
@@ -133,23 +133,36 @@ Something went wrong
 
 #### Using Match
 
-The `Match` method allows you to handle both success and failure cases in a single expression.
+The `Match` method allows you to handle both success and failure cases.
 
 ```csharp
 var result = Result<int>.Success(42);
 
-var output = result.Match(
-    success => $"Success with value: {success}",
-    failure => $"Failure with error: {failure.Message}"
+result.Match(
+    success => Console.WriteLine($"Success with value: {success}"),
+    failure => Console.WriteLine($"Failure with error: {failure.Message}")
 );
-
-Console.WriteLine(output);
 ```
 
-This will print:
+```csharp
+var result = Result<int>.Failure(new Error("Something went wrong"));
+
+result.Match(
+    success => Console.WriteLine($"Success with value: {success}"),
+    failure => Console.WriteLine($"Failure with error: {failure.Message}")
+);
+```
+
+For a successful result, this will print:
 
 ```bash
 Success with value: 42
+```
+
+For a failed result, this will print:
+
+```bash
+Failure with error: Something went wrong
 ```
 
 #### Combining Results
@@ -171,7 +184,7 @@ else
     Console.WriteLine(combinedResult.Error.Message);
 }
 
-var defaultResult = failureResult.OrElse(10);
+var defaultResult = failureResult.OrElse(_ => Result<int>.Success(10));
 
 if (defaultResult.IsSuccess)
 {
@@ -219,6 +232,59 @@ For `failureResult`, this will print:
 Failure with error: Something went wrong
 ```
 
+#### Chaining Extension Methods
+
+You can chain multiple extension methods to perform complex operations in a concise manner.
+
+```csharp
+var divisor = 5;
+List<string> numbers = new List<string> { "8", "32", "60s", "-32", "101", "hello", "256", "-4096", "514", "1024", "dd2048" };
+
+var results = numbers
+    .Select(s =>
+        ParseToInt(s)
+            .Validate(IsPositive, n => new ValidationError($"{n} is not positive."))
+            .Validate(IsEven, n => new ValidationError($"{n} is not even."))
+            .Validate(IsPowerOfTwo, n => new ValidationError($"{n} is not a power of two."))
+            .AndThen(n => Divide(n, divisor))
+    ).ToList();
+
+results.ForEach(result => result.Match(
+    onSuccess: value => Console.WriteLine($"{value.Dividend} / {value.Divisor} = {value.Quotient}"),
+    onFailure: error => Console.WriteLine($"Error: {error.Message}")
+));
+
+Result<Division> Divide(int dividend, int divisor)
+{
+    if (divisor == 0)
+        return new DivisionError("Division by zero is not allowed.");
+    return new Division(dividend, divisor, dividend / divisor);
+}
+
+Result<int> ParseToInt(string s)
+{
+    if (int.TryParse(s, out var result))
+        return result;
+    return new ParseError($"Failed to parse '{s}' to int.");
+}
+
+bool IsEven(int n) => n % 2 == 0;
+
+bool IsPowerOfTwo(int n) => n != 0 && (n & (n - 1)) == 0;
+
+bool IsPositive(int n) => n > 0;
+
+record struct Division(int Dividend, int Divisor, int Quotient);
+
+record ParseError(string Message) : Error(Message);
+
+record DivisionError(string Message) : Error(Message);
+
+record ValidationError(string Message) : Error(Message);
+```
+
+In this example, the code parses a list of strings to integers, validates them, and performs a division operation. The results are then printed, showing either the successful division or an error message.
+
 #### Using Boolean Extension Methods for Result
 
 The `Result` type includes several boolean extension methods that allow you to perform checks on the result.
@@ -246,14 +312,14 @@ This will print:
 Result contains the value 42
 ```
 
-##### IsOkAnd
+##### IsSuccessAnd
 
-The `IsOkAnd` method checks if the result is a success and satisfies a given predicate.
+The `IsSuccessAnd` method checks if the result is a success and satisfies a given predicate.
 
 ```csharp
 var result = Result<int>.Success(42);
 
-if (result.IsOkAnd(value => value > 40))
+if (result.IsSuccessAnd(value => value > 40))
 {
     Console.WriteLine("Result is a success and the value is greater than 40");
 }
@@ -269,14 +335,14 @@ This will print:
 Result is a success and the value is greater than 40
 ```
 
-##### IsErrAnd
+##### IsFailureAnd
 
-The `IsErrAnd` method checks if the result is a failure and satisfies a given predicate.
+The `IsFailureAnd` method checks if the result is a failure and satisfies a given predicate.
 
 ```csharp
 var result = Result<int>.Failure(new Error("Something went wrong"));
 
-if (result.IsErrAnd(error => error.Message.Contains("wrong")))
+if (result.IsFailureAnd(error => error.Message.Contains("wrong")))
 {
     Console.WriteLine("Result is a failure and the error message contains 'wrong'");
 }
@@ -292,14 +358,14 @@ This will print:
 Result is a failure and the error message contains 'wrong'
 ```
 
-##### IsErrOr
+##### IsFailureOr
 
-The `IsErrOr` method checks if the result is a failure or satisfies a given predicate.
+The `IsFailureOr` method checks if the result is a failure or satisfies a given predicate.
 
 ```csharp
 var result = Result<int>.Success(42);
 
-if (result.IsErrOr(value => value == 42))
+if (result.IsFailureOr(value => value == 42))
 {
     Console.WriteLine("Result is a failure or the value is 42");
 }

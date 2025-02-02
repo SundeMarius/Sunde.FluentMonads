@@ -71,167 +71,276 @@ public class ResultTests
     }
 
     [Fact]
-    public void Result_Success_Match_Action()
+    public void Result_Success_Match()
     {
         var result = Result<int>.Success(42);
-        var successCalled = false;
-        var failureCalled = false;
-
+        var matched = false;
         result.Match(
-            success: _ => successCalled = true,
-            failure: _ => failureCalled = true
+            success => matched = success == 42,
+            failure => matched = false
         );
-
-        Assert.True(successCalled);
-        Assert.False(failureCalled);
+        Assert.True(matched);
     }
 
     [Fact]
-    public void Result_Failure_Match_Action()
+    public void Result_Failure_Match()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        var successCalled = false;
-        var failureCalled = false;
-
+        var matched = false;
         result.Match(
-            success: _ => successCalled = true,
-            failure: _ => failureCalled = true
+            success => matched = false,
+            failure => matched = failure.Message == "Something went wrong"
         );
-
-        Assert.False(successCalled);
-        Assert.True(failureCalled);
+        Assert.True(matched);
     }
 
     [Fact]
-    public void NonGenericResult_Success_Match_Action()
+    public void Result_Success_And()
     {
-        var result = Result.Success();
-        var successCalled = false;
-        var failureCalled = false;
-
-        result.Match(
-            success: _ => successCalled = true,
-            failure: _ => failureCalled = true
-        );
-
-        Assert.True(successCalled);
-        Assert.False(failureCalled);
+        var result1 = Result<int>.Success(42);
+        var result2 = Result<int>.Success(84);
+        var andResult = result1.And(result2);
+        Assert.True(andResult.IsSuccess);
+        Assert.Equal(84, andResult.Value);
     }
 
     [Fact]
-    public void NonGenericResult_Failure_Match_Action()
+    public void Result_Failure_And()
     {
-        var result = Result.Failure(new Error("Something went wrong"));
-        var successCalled = false;
-        var failureCalled = false;
-
-        result.Match(
-            success: _ => successCalled = true,
-            failure: _ => failureCalled = true
-        );
-
-        Assert.False(successCalled);
-        Assert.True(failureCalled);
+        var result1 = Result<int>.Failure(new Error("Something went wrong"));
+        var result2 = Result<int>.Success(84);
+        var andResult = result1.And(result2);
+        Assert.True(andResult.IsFailure);
+        Assert.Equal("Something went wrong", andResult.Error.Message);
     }
 
     [Fact]
-    public void Result_Success_Or_Value()
+    public void Result_Success_AndThen()
     {
         var result = Result<int>.Success(42);
-        var value = result.Or(Result<int>.Success(100));
-        Assert.Equal(42, value.Value);
+        var andThenResult = result.AndThen(x => Result<int>.Success(x * 2));
+        Assert.True(andThenResult.IsSuccess);
+        Assert.Equal(84, andThenResult.Value);
     }
 
     [Fact]
-    public void Result_Failure_Or_Value()
+    public void Result_Failure_AndThen()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        var value = result.Or(Result<int>.Success(100));
-        Assert.Equal(100, value.Value);
+        var andThenResult = result.AndThen(x => Result<int>.Success(x * 2));
+        Assert.True(andThenResult.IsFailure);
+        Assert.Equal("Something went wrong", andThenResult.Error.Message);
     }
 
     [Fact]
-    public void Result_Success_Or_Error()
+    public void Result_Success_Or()
     {
-        var result = Result<int>.Success(42);
-        var value = result.Or(Result<int>.Failure(new Error("Another error")));
-        Assert.Equal(42, value.Value);
+        var result1 = Result<int>.Success(42);
+        var result2 = Result<int>.Success(84);
+        var orResult = result1.Or(result2);
+        Assert.True(orResult.IsSuccess);
+        Assert.Equal(42, orResult.Value);
     }
 
     [Fact]
-    public void Result_Failure_Or_Error()
+    public void Result_Failure_Or()
     {
-        var result = Result<int>.Failure(new Error("Something went wrong"));
-        var value = result.Or(Result<int>.Failure(new Error("Another error")));
-        Assert.Equal("Another error", value.Error.Message);
+        var result1 = Result<int>.Failure(new Error("Something went wrong"));
+        var result2 = Result<int>.Success(84);
+        var orResult = result1.Or(result2);
+        Assert.True(orResult.IsSuccess);
+        Assert.Equal(84, orResult.Value);
     }
 
     [Fact]
     public void Result_Success_OrElse_Value()
     {
         var result = Result<int>.Success(42);
-        var value = result.OrElse(100);
-        Assert.Equal(42, value);
+        var orElseResult = result.UnwrapOr(84);
+        Assert.Equal(42, orElseResult);
     }
 
     [Fact]
     public void Result_Failure_OrElse_Value()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        var value = result.OrElse(100);
-        Assert.Equal(100, value);
+        var orElseResult = result.UnwrapOr(84);
+        Assert.Equal(84, orElseResult);
     }
 
     [Fact]
     public void Result_Success_OrElse_Func()
     {
         var result = Result<int>.Success(42);
-        var value = result.OrElse(() => 100);
-        Assert.Equal(42, value);
+        var orElseResult = result.UnwrapOrElse(() => 84);
+        Assert.Equal(42, orElseResult);
     }
 
     [Fact]
     public void Result_Failure_OrElse_Func()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        var value = result.OrElse(() => 100);
-        Assert.Equal(100, value);
+        var orElseResult = result.UnwrapOrElse(() => 84);
+        Assert.Equal(84, orElseResult);
+    }
+
+    [Fact]
+    public void Result_Success_OrElse_ErrorFunc()
+    {
+        var result = Result<int>.Success(42);
+        var orElseResult = result.OrElse(error => Result<int>.Success(84));
+        Assert.True(orElseResult.IsSuccess);
+        Assert.Equal(42, orElseResult.Value);
+    }
+
+    [Fact]
+    public void Result_Failure_OrElse_ErrorFunc()
+    {
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        var orElseResult = result.OrElse(error => Result<int>.Success(84));
+        Assert.True(orElseResult.IsSuccess);
+        Assert.Equal(84, orElseResult.Value);
+    }
+
+    [Fact]
+    public void Result_Success_Validate()
+    {
+        var result = Result<int>.Success(42);
+        var validatedResult = result.Validate(x => x > 40, new Error("Validation failed"));
+        Assert.True(validatedResult.IsSuccess);
+        Assert.Equal(42, validatedResult.Value);
+    }
+
+    [Fact]
+    public void Result_Success_ValidationFailed()
+    {
+        var result = Result<int>.Success(36);
+        var validatedResult = result.Validate(x => x > 40, new Error("Validation failed"));
+        Assert.True(validatedResult.IsFailure);
+        Assert.Equal("Validation failed", validatedResult.Error.Message);
+    }
+
+    [Fact]
+    public void Result_Failure_Validate()
+    {
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        var validatedResult = result.Validate(x => x > 40, new Error("Validation failed"));
+        Assert.True(validatedResult.IsFailure);
+        Assert.Equal("Something went wrong", validatedResult.Error.Message);
+    }
+
+    [Fact]
+    public void Result_Success_Validate_WithErrorFunc_PredicateTrue()
+    {
+        var result = Result<int>.Success(42);
+        var validatedResult = result.Validate(x => x > 40, x => new Error($"Validation failed for value {x}"));
+        Assert.True(validatedResult.IsSuccess);
+        Assert.Equal(42, validatedResult.Value);
+    }
+
+    [Fact]
+    public void Result_Success_Validate_WithErrorFunc_PredicateFalse()
+    {
+        var result = Result<int>.Success(42);
+        var validatedResult = result.Validate(x => x > 50, x => new Error($"Validation failed for value {x}"));
+        Assert.True(validatedResult.IsFailure);
+        Assert.Equal("Validation failed for value 42", validatedResult.Error.Message);
+    }
+
+    [Fact]
+    public void Result_Failure_Validate_WithErrorFunc()
+    {
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        var validatedResult = result.Validate(x => x > 40, x => new Error($"Validation failed for value {x}"));
+        Assert.True(validatedResult.IsFailure);
+        Assert.Equal("Something went wrong", validatedResult.Error.Message);
+    }
+
+    [Fact]
+    public void Result_Success_TryCatch()
+    {
+        var result = Result<int>.Success(42);
+        var tryCatchResult = result.TryCatch(x => x / 0);
+        Assert.True(tryCatchResult.IsFailure);
+        Assert.Equal("Attempted to divide by zero.", tryCatchResult.Error.Message);
+    }
+
+    [Fact]
+    public void Result_Failure_TryCatch()
+    {
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        var tryCatchResult = result.TryCatch(x => x / 0);
+        Assert.True(tryCatchResult.IsFailure);
+        Assert.Equal("Something went wrong", tryCatchResult.Error.Message);
+    }
+
+    [Fact]
+    public void Result_TryCatch_Func()
+    {
+        var tryCatchResult = ResultExtensions.TryCatch(() => throw new Exception("Something went wrong"));
+        Assert.True(tryCatchResult.IsFailure);
+        Assert.Equal("Something went wrong", tryCatchResult.Error.Message);
+    }
+
+    [Fact]
+    public void Result_TryCatch_Action()
+    {
+        var tryCatchResult = ResultExtensions.TryCatch(() => { throw new InvalidOperationException("Something went wrong"); });
+        Assert.True(tryCatchResult.IsFailure);
+        Assert.Equal("Something went wrong", tryCatchResult.Error.Message);
     }
 
     [Fact]
     public void Result_Success_OnSuccess()
     {
         var result = Result<int>.Success(42);
-        var called = false;
-        result.OnSuccess(value => called = true);
-        Assert.True(called);
+        var successCalled = false;
+        result.OnSuccess(x => successCalled = x == 42);
+        Assert.True(successCalled);
     }
 
     [Fact]
     public void Result_Failure_OnSuccess()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        var called = false;
-        result.OnSuccess(value => called = true);
-        Assert.False(called);
+        var successCalled = false;
+        result.OnSuccess(x => successCalled = true);
+        Assert.False(successCalled);
     }
 
     [Fact]
     public void Result_Success_OnFailure()
     {
         var result = Result<int>.Success(42);
-        var called = false;
-        result.OnFailure(error => called = true);
-        Assert.False(called);
+        var failureCalled = false;
+        result.OnFailure(e => failureCalled = true);
+        Assert.False(failureCalled);
     }
 
     [Fact]
     public void Result_Failure_OnFailure()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        var called = false;
-        result.OnFailure(error => called = true);
-        Assert.True(called);
+        var failureCalled = false;
+        result.OnFailure(e => failureCalled = e.Message == "Something went wrong");
+        Assert.True(failureCalled);
+    }
+
+    [Fact]
+    public void Result_Success_Ok()
+    {
+        var result = Result<int>.Success(42);
+        var option = result.Ok();
+        Assert.True(option.IsSome);
+        Assert.Equal(42, option.Value);
+    }
+
+    [Fact]
+    public void Result_Failure_Ok()
+    {
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        var option = result.Ok();
+        Assert.True(option.IsNone);
     }
 
     [Fact]
@@ -249,111 +358,91 @@ public class ResultTests
     }
 
     [Fact]
-    public void Result_Success_IsOkAnd()
+    public void Result_Success_IsSuccessAnd()
     {
         var result = Result<int>.Success(42);
-        Assert.True(result.IsOkAnd(value => value == 42));
+        Assert.True(result.IsSuccessAnd(x => x == 42));
     }
 
     [Fact]
-    public void Result_Failure_IsOkAnd()
+    public void Result_Failure_IsSuccessAnd()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        Assert.False(result.IsOkAnd(value => value == 42));
+        Assert.False(result.IsSuccessAnd(x => x == 42));
     }
 
     [Fact]
-    public void Result_Success_IsErrAnd()
+    public void Result_Success_IsFailureAnd()
     {
         var result = Result<int>.Success(42);
-        Assert.False(result.IsErrAnd(error => error.Message == "Something went wrong"));
+        Assert.False(result.IsFailureAnd(e => e.Message == "Something went wrong"));
     }
 
     [Fact]
-    public void Result_Failure_IsErrAnd()
+    public void Result_Failure_IsFailureAnd()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        Assert.True(result.IsErrAnd(error => error.Message == "Something went wrong"));
+        Assert.True(result.IsFailureAnd(e => e.Message == "Something went wrong"));
     }
 
     [Fact]
-    public void Result_Success_IsErrOr()
+    public void Result_Success_IsFailureOr()
     {
         var result = Result<int>.Success(42);
-        Assert.True(result.IsErrOr(value => value == 42));
+        Assert.True(result.IsFailureOr(x => x == 42));
     }
 
     [Fact]
-    public void Result_Failure_IsErrOr()
+    public void Result_Failure_IsFailureOr()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
-        Assert.True(result.IsErrOr(value => value == 42));
+        Assert.True(result.IsFailureOr(x => x == 42));
     }
 
     [Fact]
-    public void NonGenericResult_Success()
+    public void Result_Success_ImplicitConversion()
     {
-        var result = Result.Success();
+        Result<int> result = 42;
         Assert.True(result.IsSuccess);
-        Assert.False(result.IsFailure);
+        Assert.Equal(42, result.Value);
     }
 
     [Fact]
-    public void NonGenericResult_Success_OnSuccess()
+    public void Result_Failure_ImplicitConversion()
     {
-        var result = Result.Success();
-        var called = false;
-        result.OnSuccess(_ => called = true);
-        Assert.True(called);
-    }
-
-    [Fact]
-    public void NonGenericResult_Success_OnFailure()
-    {
-        var result = Result.Success();
-        var called = false;
-        result.OnFailure(_ => called = true);
-        Assert.False(called);
-    }
-
-    [Fact]
-    public void NonGenericResult_Failure()
-    {
-        var result = Result.Failure(new Error("Something went wrong"));
-        Assert.False(result.IsSuccess);
+        Result<int> result = new Error("Something went wrong");
         Assert.True(result.IsFailure);
         Assert.Equal("Something went wrong", result.Error.Message);
     }
 
     [Fact]
-    public void NonGenericResult_Failure_OnSuccess()
+    public void Result_Success_StaticSuccess()
     {
-        var result = Result.Failure(new Error("Something went wrong"));
-        var called = false;
-        result.OnSuccess(_ => called = true);
-        Assert.False(called);
+        var result = Result<int>.Success(42);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(42, result.Value);
     }
 
     [Fact]
-    public void NonGenericResult_Failure_OnFailure()
+    public void Result_Failure_StaticFailure()
     {
-        var result = Result.Failure(new Error("Something went wrong"));
-        var called = false;
-        result.OnFailure(_ => called = true);
-        Assert.True(called);
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        Assert.True(result.IsFailure);
+        Assert.Equal("Something went wrong", result.Error.Message);
     }
 
     [Fact]
-    public void NonGenericResult_Failure_ThrowsWhenAccessingValue()
-    {
-        var result = Result.Failure(new Error("Something went wrong"));
-        Assert.Throws<InvalidOperationException>(() => result.Value);
-    }
-
-    [Fact]
-    public void NonGenericResult_Success_ThrowsWhenAccessingError()
+    public void Result_Success_GenericSuccess()
     {
         var result = Result.Success();
-        Assert.Throws<InvalidOperationException>(() => result.Error);
+        Assert.True(result.IsSuccess);
+    }
+
+    [Fact]
+    public void Result_Failure_GenericFailure()
+    {
+        var result = Result.Failure(new Error("Something went wrong"));
+        Assert.True(result.IsFailure);
+        Assert.Equal("Something went wrong", result.Error.Message);
     }
 }
