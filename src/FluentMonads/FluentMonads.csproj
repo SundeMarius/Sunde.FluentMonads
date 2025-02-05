@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Sunde.FluentMonads</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>Marius Sunde</Authors>
     <Owners>Marius Sunde</Owners>
     <Description>The FluentMonads library provides a set of functional programming constructs for .NET,
       including Result and Option types.</Description>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes>Upgrade to .NET9</PackageReleaseNotes>
     <Copyright>Copyright © 2025 Marius Sunde</Copyright>
     <PackageTags>c# .net fluent monads functional-programming result option</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/SundeMarius/monads</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/SundeMarius/monads</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/SundeMarius/Sunde.FluentMonads</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SundeMarius/Sunde.FluentMonads</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
