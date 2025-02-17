@@ -71,6 +71,11 @@ public static class ResultExtensions
         return result.IsSuccess ? func(result.Value) : result.Error;
     }
 
+    public static async Task<Result<TNew>> MapAsync<T, TNew>(this Result<T> result, Func<T, Task<TNew>> func)
+    {
+        return result.IsSuccess ? Result<TNew>.Success(await func(result.Value)) : Result<TNew>.Failure(result.Error);
+    }
+
     public static Result<T> MapError<T>(this Result<T> result, Func<Error, Error> func)
     {
         return result.IsFailure ? func(result.Error) : result;
@@ -92,6 +97,11 @@ public static class ResultExtensions
     public static Result<TNew> AndThen<T, TNew>(this Result<T> result, Func<T, Result<TNew>> func)
     {
         return result.IsSuccess ? func(result.Value) : result.Error;
+    }
+
+    public static Task<Result<TNew>> AndThenAsync<T, TNew>(this Result<T> result, Func<T, Task<Result<TNew>>> func)
+    {
+        return result.IsSuccess ? func(result.Value) : Task.FromResult(Result<TNew>.Failure(result.Error));
     }
 
     public static Result<T> Or<T>(this Result<T> result, Result<T> other)

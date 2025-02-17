@@ -55,6 +55,24 @@ public class ResultTests
     }
 
     [Fact]
+    public async Task Result_Success_CanMapAsyncValue()
+    {
+        var result = Result<int>.Success(42);
+        var mapped = await result.MapAsync(x => Task.FromResult(x * 2));
+        Assert.True(mapped.IsSuccess);
+        Assert.Equal(84, mapped.Value);
+    }
+
+    [Fact]
+    public async Task Result_Failure_CanMapAsyncValue()
+    {
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        var mapped = await result.MapAsync(x => Task.FromResult(x * 2));
+        Assert.True(mapped.IsFailure);
+        Assert.Equal("Something went wrong", mapped.Error.Message);
+    }
+
+    [Fact]
     public void Result_Failure_CanMapError()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
@@ -126,10 +144,28 @@ public class ResultTests
     }
 
     [Fact]
+    public async Task Result_Success_AndThenAsync()
+    {
+        var result = Result<int>.Success(42);
+        var andThenResult = await result.AndThenAsync(x => Task.FromResult(Result<string>.Success((x * 2).ToString())));
+        Assert.True(andThenResult.IsSuccess);
+        Assert.Equal("84", andThenResult.Value);
+    }
+
+    [Fact]
     public void Result_Failure_AndThen()
     {
         var result = Result<int>.Failure(new Error("Something went wrong"));
         var andThenResult = result.AndThen(x => Result<int>.Success(x * 2));
+        Assert.True(andThenResult.IsFailure);
+        Assert.Equal("Something went wrong", andThenResult.Error.Message);
+    }
+
+    [Fact]
+    public async Task Result_Failure_AndThenAsync()
+    {
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        var andThenResult = await result.AndThenAsync(x => Task.FromResult(Result<string>.Success((x * 2).ToString())));
         Assert.True(andThenResult.IsFailure);
         Assert.Equal("Something went wrong", andThenResult.Error.Message);
     }

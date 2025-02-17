@@ -4,12 +4,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Sunde.FluentMonads</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Marius Sunde</Authors>
     <Owners>Marius Sunde</Owners>
     <Description>The FluentMonads library provides a set of functional programming constructs for .NET,
       including Result and Option types.</Description>
-    <PackageReleaseNotes>Upgrade to .NET9</PackageReleaseNotes>
+    <PackageReleaseNotes>Add MapAsync and AndThenAsync</PackageReleaseNotes>
     <Copyright>Copyright © 2025 Marius Sunde</Copyright>
     <PackageTags>c# .net fluent monads functional-programming result option</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
