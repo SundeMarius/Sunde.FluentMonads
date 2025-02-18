@@ -30,6 +30,18 @@ public class Result<T>
 
     public static implicit operator Result<T>(Error error) => new(error);
 
+    public static implicit operator Result(Result<T> result)
+    {
+        if (result.IsSuccess)
+        {
+            return Result.Success();
+        }
+        else
+        {
+            return Result.Failure(result.Error);
+        }
+    }
+
     public static Result<T> Success(T value) => new(value);
 
     public static Result<T> Failure(Error error) => new(error);
@@ -81,12 +93,12 @@ public static class ResultExtensions
         return result.IsFailure ? func(result.Error) : result;
     }
 
-    public static void Match<T>(this Result<T> result, Action<T> onSuccess, Action<Error> onFailure)
+    public static TResult Match<T, TResult>(this Result<T> result, Func<T, TResult> onSuccess, Func<Error, TResult> onFailure)
     {
         if (result.IsSuccess)
-            onSuccess(result.Value);
+            return onSuccess(result.Value);
         else
-            onFailure(result.Error);
+            return onFailure(result.Error);
     }
 
     public static Result<T> And<T>(this Result<T> result, Result<T> other)

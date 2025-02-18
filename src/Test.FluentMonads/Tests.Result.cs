@@ -5,6 +5,50 @@ namespace Test.FluentMonads;
 public class ResultTests
 {
     [Fact]
+    public void ImplicitConversion_ShouldConvert_SuccessResult()
+    {
+        // Arrange
+        var successValue = 42;
+        Result<int> successResult = Result<int>.Success(successValue);
+
+        // Act
+        Result result = successResult;
+
+        // Assert
+        Assert.True(result.IsSuccess);
+    }
+
+    [Fact]
+    public void ImplicitConversion_ShouldConvert_FailureResult()
+    {
+        // Arrange
+        var error = new Error("Something went wrong");
+        Result<int> failureResult = Result<int>.Failure(error);
+
+        // Act
+        Result result = failureResult;
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal(error, result.Error);
+    }
+
+    [Fact]
+    public void ImplicitConversion_ShouldNotChange_Error_OnFailureResult()
+    {
+        // Arrange
+        var error = new Error("Custom error message");
+        Result<string> failureResult = Result<string>.Failure(error);
+
+        // Act
+        Result result = failureResult;
+
+        // Assert
+        Assert.True(result.IsFailure);
+        Assert.Equal("Custom error message", result.Error.Message);
+    }
+
+    [Fact]
     public void Result_Success_HasValue()
     {
         var result = Result<int>.Success(42);
@@ -52,6 +96,72 @@ public class ResultTests
         var mapped = result.Map(x => x * 2);
         Assert.True(mapped.IsFailure);
         Assert.Equal("Something went wrong", mapped.Error.Message);
+    }
+
+    [Fact]
+    public void Match_ShouldReturnCorrectValue_WhenSuccess()
+    {
+        // Arrange
+        var successResult = Result<int>.Success(42);
+
+        // Act
+        var result = successResult.Match(
+            onSuccess: value => $"Success with value: {value}",
+            onFailure: error => $"Failure with error: {error.Message}"
+        );
+
+        // Assert
+        Assert.Equal("Success with value: 42", result);
+    }
+
+    [Fact]
+    public void Match_ShouldReturnCorrectValue_WhenFailure()
+    {
+        // Arrange
+        var error = new Error("Something went wrong");
+        var failureResult = Result<int>.Failure(error);
+
+        // Act
+        var result = failureResult.Match(
+            onSuccess: value => $"Success with value: {value}",
+            onFailure: err => $"Failure with error: {err.Message}"
+        );
+
+        // Assert
+        Assert.Equal("Failure with error: Something went wrong", result);
+    }
+
+    [Fact]
+    public void Match_ShouldHandleDifferentTypes_WhenSuccess()
+    {
+        // Arrange
+        var successResult = Result<int>.Success(100);
+
+        // Act
+        var result = successResult.Match(
+            onSuccess: value => value * 2,
+            onFailure: error => 0
+        );
+
+        // Assert
+        Assert.Equal(200, result);
+    }
+
+    [Fact]
+    public void Match_ShouldHandleDifferentTypes_WhenFailure()
+    {
+        // Arrange
+        var error = new Error("Error message");
+        var failureResult = Result<int>.Failure(error);
+
+        // Act
+        var result = failureResult.Match(
+            onSuccess: value => value * 2,
+            onFailure: err => err.Message.Length
+        );
+
+        // Assert
+        Assert.Equal(13, result);
     }
 
     [Fact]
