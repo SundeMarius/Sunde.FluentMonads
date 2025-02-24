@@ -194,11 +194,25 @@ public static class ResultExtensions
         return result;
     }
 
+    public static Task<Result<T>> OnSuccessAsync<T>(this Result<T> result, Action<T> action)
+    {
+        if (result.IsSuccess)
+            action(result.Value);
+        return Task.FromResult(result);
+    }
+
     public static Result<T> OnFailure<T>(this Result<T> result, Action<Error> action)
     {
         if (result.IsFailure)
             action(result.Error);
         return result;
+    }
+
+    public static Task<Result<T>> OnFailureAsync<T>(this Result<T> result, Action<Error> action)
+    {
+        if (result.IsFailure)
+            action(result.Error);
+        return Task.FromResult(result);
     }
 
     public static Option<T> Ok<T>(this Result<T> result)

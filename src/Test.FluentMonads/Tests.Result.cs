@@ -515,6 +515,24 @@ public class ResultTests
     }
 
     [Fact]
+    public async Task Result_Success_OnSuccessAsync()
+    {
+        var result = Result<int>.Success(42);
+        var successCalled = false;
+        await result.OnSuccessAsync(x => successCalled = x == 42);
+        Assert.True(successCalled);
+    }
+
+    [Fact]
+    public async Task Result_Failure_OnSuccessAsync()
+    {
+        var result = Result<int>.Failure(new Error("something is wrong"));
+        var successCalled = false;
+        await result.OnSuccessAsync(x => successCalled = true);
+        Assert.False(successCalled);
+    }
+
+    [Fact]
     public void Result_Success_OnFailure()
     {
         var result = Result<int>.Success(42);
@@ -529,6 +547,24 @@ public class ResultTests
         var result = Result<int>.Failure(new Error("Something went wrong"));
         var failureCalled = false;
         result.OnFailure(e => failureCalled = e.Message == "Something went wrong");
+        Assert.True(failureCalled);
+    }
+
+    [Fact]
+    public async Task Result_Success_OnFailureAsync()
+    {
+        var result = Result<int>.Success(42);
+        var failureCalled = false;
+        await result.OnFailureAsync(e => failureCalled = true);
+        Assert.False(failureCalled);
+    }
+
+    [Fact]
+    public async Task Result_Failure_OnFailureAsync()
+    {
+        var result = Result<int>.Failure(new Error("Something went wrong"));
+        var failureCalled = false;
+        await result.OnFailureAsync(e => failureCalled = e.Message == "Something went wrong");
         Assert.True(failureCalled);
     }
 

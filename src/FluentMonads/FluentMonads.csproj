@@ -4,12 +4,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>Sunde.FluentMonads</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>Marius Sunde</Authors>
     <Owners>Marius Sunde</Owners>
     <Description>The FluentMonads library provides a set of functional programming constructs for .NET,
       including Result and Option types.</Description>
-    <PackageReleaseNotes>Add implicit conversion from generic Result to Result, improve Match method</PackageReleaseNotes>
+    <PackageReleaseNotes>Add Async functionality for OnSuccess and OnFailure. Ignore null values when serializing error</PackageReleaseNotes>
     <Copyright>Copyright © 2025 Marius Sunde</Copyright>
     <PackageTags>c# .net fluent monads functional-programming result option</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
